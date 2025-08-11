@@ -16,14 +16,13 @@ public class GridVisualizer : MonoBehaviour, IInitializable
     [SerializeField] private Transform _offset;
 
     [Header("---Grid Attachments")]
-    [SerializeField] private List<GameObject> _nodePrefab;    // 1-)Red, 2- Green, 3-) Blue, 4-) Yellow, 5-) Puprle, 6-) White
+    [SerializeField] private List<GameObject> _nodePrefab;
     [SerializeField] private GameObject _gridPrefab;
 
     public Vector2Int Size => _gridManager.GridSize;
     public Vector2 OffsetPosition => _offset.position;
 
     [Inject] private GridManager _gridManager;
-    [Inject] private MatchManager _matchManager;
 
 
 
@@ -47,37 +46,7 @@ public class GridVisualizer : MonoBehaviour, IInitializable
         newPos.y = y + _offset.position.y - (Size.y / 2f) + .5f;
         return newPos;
     }
-    public void SetColor(Node node)
-    {
-        NodeColor[] nodeColors = (NodeColor[])Enum.GetValues(typeof(NodeColor));
-        int randomColorIndex = Random.Range(0, nodeColors.Length - 1);
-        NodeColor randomColor = nodeColors[randomColorIndex];
-        node.NodeColorValue = randomColor;
-        node.NodeObject = CreateNode(node, _nodePrefab[randomColorIndex]);
-    }
     public void Initialize()
     {
-        EventManager.Subscribe<OnClick>(PopNodes);
     }
-    void OnDestroy()
-    {
-        EventManager.UnSubscribe<OnClick>(PopNodes);
-    }
-    public void PopNodes(OnClick data) => StartCoroutine(PopNodesIE(data));
-    private IEnumerator PopNodesIE(OnClick data)
-    {
-        List<Node> matched = _matchManager.MatchedPieces(Vector2Int.RoundToInt(data.Position));
-        if (matched == null) yield break;
-        if (matched.Count <= 1) yield break;
-
-        foreach (Node piece in matched)
-        {
-            piece.Busy = true;
-            yield return piece.NodeObject.transform.DOPunchScale(Vector2.one * _popStrengthMult, _popDuration).WaitForCompletion();
-        }
-        matched.ForEach((node) => Destroy(node.NodeObject));
-    }
-    private GameObject CreateNode(Node node, GameObject nodePrefab) => Instantiate(nodePrefab, node.GridObject.transform.position, Quaternion.identity);
-
-
 }

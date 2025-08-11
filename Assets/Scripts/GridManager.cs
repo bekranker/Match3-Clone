@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -32,12 +31,15 @@ public class GridManager : MonoBehaviour, IInitializable
             {
                 Node newCell = new Node(new Vector2Int(x, y), _gridVisualizer.CreateGrid(x, y), true, SetNeighboors(x, y));
                 Cells[x, y] = newCell;
-                _gridVisualizer.SetColor(newCell);
+                // _gridVisualizer.SetColor(newCell);
                 yield return new WaitForSeconds(_spawnRate);
             }
         }
         SetFreeAllGrid();
-
+        for (int x = 0; x < GridSize.x; x++)
+        {
+            EventManager.Raise(new OnGridInitialized(GridSize, Cells, new Vector2Int(x, 0)));
+        }
     }
     /// <summary>
     /// Configure the neighboors

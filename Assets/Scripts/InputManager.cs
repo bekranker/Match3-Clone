@@ -5,7 +5,7 @@ using Zenject;
 public class InputManager : MonoBehaviour
 {
     [Inject] private GridVisualizer _gridVisualizer;
-
+    [Inject] private GridManager _gridManager;
 
     void Update()
     {
@@ -23,6 +23,6 @@ public class InputManager : MonoBehaviour
         wordlPos.x -= _gridVisualizer.OffsetPosition.x - (_gridVisualizer.Size.x / 2f) + .5f;
         wordlPos.y -= _gridVisualizer.OffsetPosition.y - (_gridVisualizer.Size.y / 2f) + .5f;
 
-        EventManager.Raise(new OnClick(wordlPos));
+        EventManager.Raise(new OnClick(Vector2Int.RoundToInt(wordlPos), _gridManager.Cells));
     }
 }
